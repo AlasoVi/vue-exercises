@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="./css/bootstrap.css">
+  <script src="./js/vue.js"></script>
+</head>
+<body>
+  <div id="app">
+     <Mtable :titles="titles" :stus="stus"><h4>表格数据</h4></Mtable>
+  </div>
+
+  <template id="mpage">
+    <nav>
+      <ul class="pagination">
+        <li class="page-item disabled">
+          <a href="#" class="page-link">
+            <span>&laquo</span>
+          </a>
+        </li>
+
+        <li v-for="p in pagecount" :class="p == page? 'page-item active':'page-item'">
+          <a href="#" class="page-link">{{ p }}</a>
+        </li>
+
+        <li class="page-item">
+          <a href="#" class="page-link">
+            <span>&raquo</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </template>
+
+  <template id="mtable">
+    <div class="container">
+      <table class="table" >
+        <caption style="text-align: center; caption-side: top;"><slot></slot></caption>
+        <tr>
+          <th v-for="title in titles">{{ title }}</th>
+        </tr>
+        <tr v-for="stu in stus">
+          <!-- <td>{{ stu.name }}</td>
+          <td>{{ stu.age }}</td> -->
+          <td v-for="(value, key, index) in stu">{{ value }}</td>
+        </tr>
+      </table>
+      <!-- 使用Mpage组件 -->
+      <!-- count是组件stus中的数据条数：pagesize是每页可以显示记录数据 -->
+      <Mpage :count="stus.length" :pagesize="2"></Mpage>
+    </div>
+  </template> 
+
+
+  <script>
+    // 创建分页组件Mpage
+    var Mpage = Vue.extend({
+      template: "#mpage",
+      data: function(){
+        return {
+        // 定义当前页码（当前是第几页）
+          page: 1
+        }
+      },
+      props: ['count','pagesize'],
+      computed: {
+        // 计算总页数
+        pagecount: function(){
+          return Math.ceil( this.count / this.pagesize )
+        }
+      },
+    })
+
+    // 创建Mtable组件
+    var Mtable = Vue.extend({
+      template: '#mtable',
+      props: ['titles','stus'],
+      // 局部注册组件
+      components: {
+        Mpage
+      }
+
+    })
+
+    // 根组件
+    var vm = new Vue({
+      el: "#app",
+      data: {
+        titles: [
+          '姓名',
+          '年龄'
+        ],
+        stus: [
+          {
+            name: "张三",
+            age: 18,
+          },
+          {
+            name: "李四",
+            age: 20,
+          },
+          {  
+            name: '王五',
+            age: 16, 
+          },
+        ]
+      },
+      // 局部组件 
+      components: {
+        // "Mtable": Mtable
+        // 由于组件名相同所以简写
+        Mtable
+      }
+    })
+  </script>
+</body>
+</html>
